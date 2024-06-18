@@ -1,4 +1,4 @@
----Question: How much money does each customer spend on average at each store? (Anastasia Gontar)
+---Question: How much money does each customer spend on average at each store?
 
 WITH customer_counts AS (
     SELECT c.state, 
@@ -33,7 +33,7 @@ SELECT state,
 FROM top_states
 ORDER BY state_rank;
 
----Свириденко Екатерина:Customers from which state have made the most orders for the whole time?
+---Customers from which state have made the most orders for the whole time?
 
 select c.state, count (o.order_id) as n_orders_by_state
 from customers c 
@@ -41,7 +41,7 @@ inner join orders o on c.customer_id = o.customer_id
 group by c.state
 order by count(order_id) desc;
 
----Свириденко Екатерина: Customers from which state have made the most orders for the last available in data year(2018)?
+---СCustomers from which state have made the most orders for the last available in data year(2018)?
 
 select date_part('YEAR',o.order_date) as year, c.state, count (o.order_id) as n_orders_by_state
 from customers c 
@@ -50,7 +50,7 @@ where  date_part('YEAR',order_date) = '2018'
 group by c.state, date_part('YEAR',o.order_date)
 order by count(order_id) desc;
 
----Свириденко Екатерина:Which are top-10 cities where customers have made the most orders?
+---Which are top-10 cities where customers have made the most orders?
 
 select c.city, c.state, count(o.order_id) as n_orders_by_city
 from customers c 
@@ -59,7 +59,7 @@ group by c.city,c.state
 order by count(order_id) desc
 limit 10;
 
--- In what cities people mostly leave their phone numbers? (Vladislav Sukhoterin)
+-- In what cities people mostly leave their phone numbers?
 
 select city, count(c.city) as phone_numbers_left,
 row_number()over(order by -count(c.city))
@@ -77,7 +77,7 @@ group by c.city
 order by count(c.city) asc
 limit 10;
 
---Question: In which month are items sold the most for the whole time? (Anastasia Gontar)
+--Question: In which month are items sold the most for the whole time?
 
 SELECT EXTRACT(MONTH FROM order_date) AS month, 
        SUM(quantity * list_price) AS total_sales
@@ -86,7 +86,7 @@ JOIN project.order_items ON orders.order_id = order_items.order_id
 GROUP BY EXTRACT(MONTH FROM orders.order_date)
 ORDER BY month;
 
--- What brands are leading in terms of total revenue? (Vladislav Sukhoterin)
+-- What brands are leading in terms of total revenue?
 
 select
 b.brand_name as brand_name,
@@ -97,8 +97,7 @@ join products p using (brand_id)
 join order_items oi using (product_id)
 group by b.brand_name;
 
--- Which cities mainly buy the top-3 brands (by sales)? (Vladislav Sukhoterin)
-
+-- Which cities mainly buy the top-3 brands (by sales)? 
 select
 c.city as city,
 b.brand_name as brand_name,
@@ -113,7 +112,7 @@ group by b.brand_name, c.city
 order by total_revenue_by_city desc
 limit 10;
 
----Свириденко Екатерина:Inside of each category, what is the average difference between the product price and the average product price inside the category?
+---Inside of each category, what is the average difference between the product price and the average product price inside the category?
 
 select category_name, round(avg(product_price),2) as avg_cat_price, round(avg(price_diff),2) as avg_price_dev
 from (select c.category_name, p.list_price as product_price, abs(p.list_price - avg(p.list_price) over (partition by p.category_id)) as price_diff
@@ -122,7 +121,7 @@ from (select c.category_name, p.list_price as product_price, abs(p.list_price - 
 group by category_name
 order by round(avg(product_price),2) desc;
 
--- What is the average discount and total quantity of sold products in each category? (Vladislav Sukhoterin)
+-- What is the average discount and total quantity of sold products in each category?
 
 select c.category_name,
 concat(round(avg(oi.discount*100), 2), ' %') as average_discount,
@@ -133,7 +132,7 @@ join order_items oi using (product_id)
 group by c.category_name
 order by average_discount desc;
 
----Свириденко Екатерина:How effective are discounts in driving sales in different categories of products?
+---How effective are discounts in driving sales in different categories of products?
 
 select*,
 round(total_quantity_sold*1.0/number_of_sales,3) as share_of_bikes_by_order
@@ -144,7 +143,7 @@ inner join categories c on p.category_id =c.category_id
 group by c.category_name
 order by sum(oi.quantity) desc) as table1;
 
--- Which categories in which store generate the most revenue? (Artyom Khugaev)
+-- Which categories in which store generate the most revenue?
 
 select *, revenue_per_shop -  average_revenue_per_shop as diff
 from(
@@ -162,7 +161,7 @@ round(sum((quantity*order_items.list_price)-(quantity*order_items.list_price*dis
 ) as table2
 order by diff desc;
 
---Question: How much money did each store bring in total in 2018? (How much money did customers spend at each store in 2018?) (Anastasia Gontar)
+--Question: How much money did each store bring in total in 2018? (How much money did customers spend at each store in 2018?)
 
 SELECT 
     c.state,
@@ -174,7 +173,7 @@ WHERE EXTRACT(YEAR FROM o.order_date) = 2018
 GROUP BY c.state
 ORDER BY total_spending DESC;
 
---Question: Which employee is the most effective and brings the most value to the company in each store and among all ones in 2018? (Anastasia Gontar)
+--Question: Which employee is the most effective and brings the most value to the company in each store and among all ones in 2018? 
 
 --which employee sold the biggest number of items
 WITH ranked_staff AS (
@@ -237,7 +236,7 @@ SELECT COUNT(*) AS num_stores_in_tx
 FROM stores
 WHERE state = 'TX';
 
--- Which employee carries out the order from order_date to shipped_date the fastest? (Artyom Khugaev)
+-- Which employee carries out the order from order_date to shipped_date the fastest?
 
 select concat(first_name,' ', last_name) as employee_name,
 round(avg(shipped_date - order_date),2) as average_time_from_registration_to_shipment_of_the_order,
@@ -248,8 +247,7 @@ group by concat(first_name,' ', last_name)
 order by average_time_from_registration_to_shipment_of_the_order desc;
 ;
 
--- Which employee makes the highest average check? (Artyom Khugaev)
-
+-- Which employee makes the highest average check? 
 select concat(first_name,' ', last_name) as employee_name, 
 to_char(cast(round(avg((quantity*order_items.list_price)-(quantity*order_items.list_price*discount)),1) as decimal), 'L9G999D9') as average_check
 from order_items 
